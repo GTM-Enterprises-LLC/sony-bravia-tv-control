@@ -1,8 +1,20 @@
 {
-  "name": "bravia",
-  "version": "1.0.0",
-  "description": "Control your Sony Bravia TV",
-  "main": "lib/index.js",
+  "name": "bravia-workspace",
+  "version": "2.0.0",
+  "description": "Full-stack Sony Bravia TV Control Application",
+  "private": true,
+  "workspaces": [
+    "server",
+    "ui"
+  ],
+  "scripts": {
+    "dev": "npm run dev:server & npm run dev:ui",
+    "dev:server": "npm run dev --workspace=server",
+    "dev:ui": "npm run dev --workspace=ui",
+    "build": "npm run build --workspace=server && npm run build --workspace=ui",
+    "build:server": "npm run build --workspace=server",
+    "build:ui": "npm run build --workspace=ui"
+  },
   "dependencies": {
     "node-uuid": "^1.4.2",
     "request": "^2.51.0",
@@ -11,9 +23,6 @@
     "wake_on_lan": "0.0.4"
   },
   "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "Alan Reid",
   "license": "Apache 2.0"
 }
