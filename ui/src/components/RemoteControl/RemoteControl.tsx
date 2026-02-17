@@ -1,5 +1,6 @@
 import PowerControls from './PowerControls';
 import VolumeControls from './VolumeControls';
+import VolumeSlider from './VolumeSlider';
 import NavigationPad from './NavigationPad';
 import ChannelControls from './ChannelControls';
 import NumberPad from './NumberPad';
@@ -28,6 +29,9 @@ export default function RemoteControl() {
       {/* Remote Control Layout */}
       <div className="bg-gray-800 rounded-xl p-6 shadow-2xl space-y-6">
         <PowerControls />
+        <div className="border-t border-gray-700 pt-6">
+          <VolumeSlider />
+        </div>
         <div className="border-t border-gray-700 pt-6">
           <VolumeControls />
         </div>

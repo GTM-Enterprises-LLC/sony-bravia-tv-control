@@ -29,4 +29,5 @@ export interface CommandExecutionResponse {
 export interface UpdateConfigRequest {
   tvIp: string;
   pskKey: string;
+  macAddress?: string; // Optional MAC address for Wake-on-LAN
 }

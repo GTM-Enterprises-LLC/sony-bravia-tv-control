@@ -14,6 +14,7 @@ export function createTVRoutes(controller: TVController): Router {
   router.get('/status', asyncHandler(controller.getStatus));
   router.get('/commands', asyncHandler(controller.getCommands));
   router.get('/tv-status', asyncHandler(controller.getTVStatus));
+  router.get('/tv-info', asyncHandler(controller.getTVInfo));
 
   // Configuration routes
   router.get('/config', asyncHandler(controller.getConfig));

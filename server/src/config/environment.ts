@@ -9,6 +9,7 @@ const envSchema = z.object({
   PORT: z.string().default('3001').transform(Number),
   TV_IP: z.string().ip({ message: 'TV_IP must be a valid IP address' }),
   PSK_KEY: z.string().min(4, { message: 'PSK_KEY must be at least 4 characters' }),
+  MAC_ADDRESS: z.string().optional(), // Optional MAC address for Wake-on-LAN
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   CORS_ORIGIN: z.string().default('http://localhost:5173')
 });
@@ -18,6 +19,7 @@ export const env = envSchema.parse({
   PORT: process.env.PORT,
   TV_IP: process.env.TV_IP,
   PSK_KEY: process.env.PSK_KEY,
+  MAC_ADDRESS: process.env.MAC_ADDRESS,
   NODE_ENV: process.env.NODE_ENV,
   CORS_ORIGIN: process.env.CORS_ORIGIN
 });
@@ -26,11 +28,13 @@ export const env = envSchema.parse({
 interface RuntimeConfig {
   tvIp: string;
   pskKey: string;
+  macAddress?: string; // Optional MAC address for Wake-on-LAN
 }
 
 let runtimeConfig: RuntimeConfig = {
   tvIp: env.TV_IP,
-  pskKey: env.PSK_KEY
+  pskKey: env.PSK_KEY,
+  macAddress: env.MAC_ADDRESS
 };
 
 export const getRuntimeConfig = (): RuntimeConfig => runtimeConfig;

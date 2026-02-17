@@ -4,11 +4,13 @@ import { useTVStore } from '../../store/tv-store';
 import Button from '../common/Button';
 
 export default function PowerControls() {
-  const { isExecuting } = useTVStore();
+  const { isExecuting, fetchTVStatus } = useTVStore();
 
   const handlePowerOn = async () => {
     try {
       await tvApi.powerOn();
+      // Refresh TV status after command
+      await fetchTVStatus();
     } catch (error) {
       console.error('Failed to power on:', error);
     }
@@ -17,6 +19,8 @@ export default function PowerControls() {
   const handlePowerOff = async () => {
     try {
       await tvApi.powerOff();
+      // Refresh TV status after command
+      await fetchTVStatus();
     } catch (error) {
       console.error('Failed to power off:', error);
     }
@@ -40,6 +44,9 @@ export default function PowerControls() {
           icon={<FiPower />}
           disabled={isExecuting}
         />
+      </div>
+      <div className="text-xs text-gray-400 mt-2 p-2 bg-green-900/20 border border-green-800/30 rounded">
+        ℹ️ Power On uses the TV's power button command (works even in standby mode).
       </div>
     </div>
   );

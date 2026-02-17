@@ -11,7 +11,8 @@ export default function ConnectionSettings({ onClose }: ConnectionSettingsProps)
   const { tvIp, updateConfig, isLoading } = useTVStore();
   const [formData, setFormData] = useState({
     tvIp: tvIp || '192.168.1.28',
-    pskKey: '3553'
+    pskKey: '3553',
+    macAddress: '' // Optional MAC address for Wake-on-LAN
   });
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +34,7 @@ export default function ConnectionSettings({ onClose }: ConnectionSettingsProps)
     }
 
     try {
-      await updateConfig(formData.tvIp, formData.pskKey);
+      await updateConfig(formData.tvIp, formData.pskKey, formData.macAddress || undefined);
       onClose();
     } catch (err: any) {
       setError(err.message || 'Failed to update configuration');
@@ -94,6 +95,23 @@ export default function ConnectionSettings({ onClose }: ConnectionSettingsProps)
             />
             <p className="mt-1 text-xs text-gray-400">
               Pre-Shared Key configured on your TV (usually 4 digits)
+            </p>
+          </div>
+
+          <div>
+            <label htmlFor="macAddress" className="block text-sm font-medium text-gray-300 mb-2">
+              MAC Address (Optional)
+            </label>
+            <input
+              type="text"
+              id="macAddress"
+              value={formData.macAddress}
+              onChange={(e) => setFormData({ ...formData, macAddress: e.target.value })}
+              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="AA:BB:CC:DD:EE:FF (optional)"
+            />
+            <p className="mt-1 text-xs text-gray-400">
+              Enter TV's MAC address for reliable Wake-on-LAN. Find it in TV's network settings.
             </p>
           </div>
 

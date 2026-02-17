@@ -37,6 +37,12 @@ export const tvApi = {
     apiClient.get<APIResponse<CommandsResponse>>('/commands'),
 
   /**
+   * Get current TV status (volume, power, playing content)
+   */
+  getTVStatus: () =>
+    apiClient.get<APIResponse>('/tv-status'),
+
+  /**
    * Execute a specific command by name
    */
   executeCommand: (command: string) =>

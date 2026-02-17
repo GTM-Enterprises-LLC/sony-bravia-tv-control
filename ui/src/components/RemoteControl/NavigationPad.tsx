@@ -1,4 +1,4 @@
-import { FiArrowUp, FiArrowDown, FiArrowLeft, FiArrowRight, FiCircle, FiCornerDownLeft, FiHome, FiMenu } from 'react-icons/fi';
+import { FiArrowUp, FiArrowDown, FiArrowLeft, FiArrowRight, FiCircle, FiCornerDownLeft, FiHome, FiMenu, FiList } from 'react-icons/fi';
 import { useTVControl } from '../../hooks/useTVControl';
 import Button from '../common/Button';
 
@@ -68,6 +68,16 @@ export default function NavigationPad() {
           onClick={() => sendCommand('Options')}
           variant="secondary"
           icon={<FiMenu />}
+          disabled={isExecuting}
+        />
+      </div>
+
+      <div className="flex justify-center mt-2">
+        <Button
+          label="Guide"
+          onClick={() => sendCommand('GGuide')}
+          variant="secondary"
+          icon={<FiList />}
           disabled={isExecuting}
         />
       </div>

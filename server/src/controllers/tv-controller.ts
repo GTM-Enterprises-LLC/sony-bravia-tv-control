@@ -67,6 +67,50 @@ export class TVController {
   };
 
   /**
+   * Get comprehensive TV information
+   */
+  getTVInfo = async (req: Request, res: Response): Promise<void> => {
+    console.log(`[TVController] getTVInfo called - fetching comprehensive TV information`);
+
+    try {
+      const [
+        systemInfo,
+        externalInputs,
+        applications,
+        networkSettings,
+        ledStatus
+      ] = await Promise.allSettled([
+        this.braviaService.getSystemInformation(),
+        this.braviaService.getCurrentExternalInputsStatus(),
+        this.braviaService.getApplicationList(),
+        this.braviaService.getNetworkSettings(),
+        this.braviaService.getLEDIndicatorStatus()
+      ]);
+
+      const info = {
+        system: systemInfo.status === 'fulfilled' ? systemInfo.value : null,
+        externalInputs: externalInputs.status === 'fulfilled' ? externalInputs.value : null,
+        applications: applications.status === 'fulfilled' ? applications.value : null,
+        network: networkSettings.status === 'fulfilled' ? networkSettings.value : null,
+        led: ledStatus.status === 'fulfilled' ? ledStatus.value : null
+      };
+
+      console.log(`[TVController] ✓ TV info retrieved`);
+
+      const response: SuccessResponse = {
+        success: true,
+        data: info,
+        timestamp: new Date().toISOString()
+      };
+
+      res.json(response);
+    } catch (error: any) {
+      console.error(`[TVController] ✗ Failed to get TV info:`, error);
+      throw error;
+    }
+  };
+
+  /**
    * Execute a specific command by name
    */
   executeCommand = async (req: Request, res: Response): Promise<void> => {
@@ -96,14 +140,17 @@ export class TVController {
   };
 
   /**
-   * Power on the TV (using Wake-on-LAN)
+   * Power on the TV (using IRCC TvPower command instead of Wake-on-LAN)
+   * TvPower works reliably because it uses HTTP/IRCC protocol which the TV responds to even in standby
    */
   powerOn = async (req: Request, res: Response): Promise<void> => {
-    await this.braviaService.executeCommand('PowerOn');
+    // Use TvPower command instead of PowerOn to avoid Wake-on-LAN issues
+    // TvPower sends an IRCC command over HTTP which works in standby mode
+    await this.braviaService.executeCommand('TvPower');
 
     const response: SuccessResponse = {
       success: true,
-      data: { command: 'PowerOn' },
+      data: { command: 'TvPower' },
       timestamp: new Date().toISOString()
     };
 
@@ -282,7 +329,7 @@ export class TVController {
    * Update TV configuration
    */
   updateConfig = async (req: Request, res: Response): Promise<void> => {
-    const { tvIp, pskKey } = req.body;
+    const { tvIp, pskKey, macAddress } = req.body;
 
     if (!tvIp || !pskKey) {
       res.status(400).json({
@@ -296,8 +343,8 @@ export class TVController {
       return;
     }
 
-    // Update runtime configuration
-    updateRuntimeConfig({ tvIp, pskKey });
+    // Update runtime configuration (including optional MAC address)
+    updateRuntimeConfig({ tvIp, pskKey, macAddress });
 
     // Reinitialize Bravia service with new config
     await this.braviaService.updateConfig(tvIp, pskKey);

@@ -1,6 +1,19 @@
 import { create } from 'zustand';
 import { tvApi } from '../services/api-client';
 
+interface TVStatus {
+  volume: {
+    volume: number;
+    mute: boolean;
+    maxVolume: number;
+    minVolume: number;
+  } | null;
+  power: {
+    status: string;
+  } | null;
+  playing: any | null;
+}
+
 interface TVState {
   // Connection state
   isConnected: boolean;
@@ -11,6 +24,9 @@ interface TVState {
   isExecuting: boolean;
   lastCommand: string | null;
 
+  // TV Status
+  tvStatus: TVStatus | null;
+
   // Errors
   error: string | null;
 
@@ -20,8 +36,9 @@ interface TVState {
   // Actions
   fetchStatus: () => Promise<void>;
   fetchCommands: () => Promise<void>;
+  fetchTVStatus: () => Promise<void>;
   executeCommand: (command: string) => Promise<void>;
-  updateConfig: (tvIp: string, pskKey: string) => Promise<void>;
+  updateConfig: (tvIp: string, pskKey: string, macAddress?: string) => Promise<void>;
   clearError: () => void;
 }
 
@@ -32,6 +49,7 @@ export const useTVStore = create<TVState>((set, get) => ({
   availableCommands: [],
   isExecuting: false,
   lastCommand: null,
+  tvStatus: null,
   error: null,
   isLoading: false,
 
@@ -82,6 +100,9 @@ export const useTVStore = create<TVState>((set, get) => ({
         lastCommand: command,
         error: null
       });
+
+      // Fetch updated TV status after command execution
+      await get().fetchTVStatus();
     } catch (error: any) {
       const errorMessage = error.response?.data?.error?.message || `Failed to execute command: ${command}`;
       set({
@@ -94,10 +115,10 @@ export const useTVStore = create<TVState>((set, get) => ({
   },
 
   // Update TV configuration
-  updateConfig: async (tvIp: string, pskKey: string) => {
+  updateConfig: async (tvIp: string, pskKey: string, macAddress?: string) => {
     set({ isLoading: true, error: null });
     try {
-      await tvApi.updateConfig({ tvIp, pskKey });
+      await tvApi.updateConfig({ tvIp, pskKey, macAddress });
       set({
         isLoading: false,
         tvIp,
@@ -114,6 +135,40 @@ export const useTVStore = create<TVState>((set, get) => ({
       });
       console.error('Failed to update config:', error);
       throw error;
+    }
+  },
+
+  // Fetch TV status (volume, power, etc.)
+  fetchTVStatus: async () => {
+    try {
+      const response = await tvApi.getTVStatus();
+      if (response.data.success && response.data.data) {
+        const rawStatus = response.data.data;
+
+        // Parse volume info (it comes as nested array)
+        let volumeInfo = null;
+        if (rawStatus.volume && Array.isArray(rawStatus.volume) && rawStatus.volume[0] && rawStatus.volume[0][0]) {
+          volumeInfo = rawStatus.volume[0][0];
+        }
+
+        // Parse power info
+        let powerInfo = null;
+        if (rawStatus.power && Array.isArray(rawStatus.power) && rawStatus.power[0]) {
+          powerInfo = rawStatus.power[0];
+        }
+
+        set({
+          tvStatus: {
+            volume: volumeInfo,
+            power: powerInfo,
+            playing: rawStatus.playing
+          },
+          error: null
+        });
+      }
+    } catch (error: any) {
+      console.error('Failed to fetch TV status:', error);
+      // Don't set error for status fetch failures (non-critical)
     }
   },
 

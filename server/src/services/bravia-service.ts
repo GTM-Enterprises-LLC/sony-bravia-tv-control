@@ -59,6 +59,34 @@ export class BraviaService {
       await this.initialize();
     }
 
+    // Special handling for PowerOn (Wake-on-LAN)
+    if (command === 'PowerOn') {
+      console.log(`[BraviaService] PowerOn requested - using Wake-on-LAN`);
+      console.log(`[BraviaService] Note: WOL requires TV to be in standby mode (not fully off)`);
+
+      // Execute PowerOn (which triggers wake() in lib)
+      try {
+        this.client!.exec(command);
+        console.log(`[BraviaService] WOL packet sent (attempting to wake TV at ${this.tvIp})`);
+
+        // Longer timeout for WOL operations
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        console.log(`[BraviaService] ⚠️  PowerOn completed, but WOL success cannot be verified`);
+        console.log(`[BraviaService] If TV doesn't turn on, check:`);
+        console.log(`  - TV is in standby mode (not fully off)`);
+        console.log(`  - TV IP ${this.tvIp} is in system ARP table (run: arp -a | grep ${this.tvIp})`);
+        console.log(`  - Network allows Wake-on-LAN packets`);
+        console.log(`  - TV's WOL setting is enabled in network settings`);
+
+        return;
+      } catch (error: any) {
+        console.error(`[BraviaService] ✗ PowerOn failed:`, error);
+        throw new Error(`PowerOn failed: ${error.message}. TV must be in standby mode for Wake-on-LAN to work.`);
+      }
+    }
+
+    // Regular command execution
     console.log(`[BraviaService] Executing command: ${command}`);
     return new Promise((resolve, reject) => {
       try {
@@ -186,6 +214,48 @@ export class BraviaService {
    */
   private async getPowerStatus(): Promise<any> {
     return this.makeJsonRpcRequest('/sony/system', 'getPowerStatus', '1.0', []);
+  }
+
+  /**
+   * Get current external inputs status (HDMI, etc.)
+   */
+  async getCurrentExternalInputsStatus(): Promise<any> {
+    return this.makeJsonRpcRequest('/sony/avContent', 'getCurrentExternalInputsStatus', '1.0', []);
+  }
+
+  /**
+   * Get system information (model, version, etc.)
+   */
+  async getSystemInformation(): Promise<any> {
+    return this.makeJsonRpcRequest('/sony/system', 'getSystemInformation', '1.0', []);
+  }
+
+  /**
+   * Get list of installed applications
+   */
+  async getApplicationList(): Promise<any> {
+    return this.makeJsonRpcRequest('/sony/appControl', 'getApplicationList', '1.0', []);
+  }
+
+  /**
+   * Get network settings
+   */
+  async getNetworkSettings(): Promise<any> {
+    return this.makeJsonRpcRequest('/sony/system', 'getNetworkSettings', '1.1', [{ netif: '' }]);
+  }
+
+  /**
+   * Get LED indicator status
+   */
+  async getLEDIndicatorStatus(): Promise<any> {
+    return this.makeJsonRpcRequest('/sony/system', 'getLEDIndicatorStatus', '1.1', []);
+  }
+
+  /**
+   * Get available content list (inputs/sources)
+   */
+  async getContentList(source: string = ''): Promise<any> {
+    return this.makeJsonRpcRequest('/sony/avContent', 'getContentList', '1.5', [{ source }]);
   }
 
   /**
