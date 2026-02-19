@@ -23,6 +23,5 @@
     "wake_on_lan": "0.0.4"
   },
   "devDependencies": {},
-  "author": "Alan Reid",
   "license": "Apache 2.0"
 }
