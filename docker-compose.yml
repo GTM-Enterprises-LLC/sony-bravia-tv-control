@@ -1,0 +1,32 @@
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    # host networking is required on the Pi so the server can:
+    #   - Send Wake-on-LAN UDP broadcasts on the local network
+    #   - Read /proc/net/arp for MAC address discovery
+    # Note: network_mode: host only works on Linux. On macOS (for local dev)
+    # swap this to ports: ["3001:3001"] and update CORS_ORIGIN accordingly.
+    network_mode: host
+    environment:
+      PORT: 3001
+      NODE_ENV: production
+      TV_IP: ${TV_IP}
+      PSK_KEY: ${PSK_KEY}
+      MAC_ADDRESS: ${MAC_ADDRESS:-}
+      # With Nginx proxying on the same host, the browser origin is the Pi's IP.
+      # Set this to http://<your-pi-ip> or use * to allow any local client.
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    restart: unless-stopped
+
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    # host networking puts Nginx directly on port 80 of the Pi.
+    # Nginx then proxies /api to localhost:3001 (the server above).
+    network_mode: host
+    depends_on:
+      - server
+    restart: unless-stopped
