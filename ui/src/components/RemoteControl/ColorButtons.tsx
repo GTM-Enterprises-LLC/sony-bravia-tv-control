@@ -1,5 +1,4 @@
 import { useTVControl } from '../../hooks/useTVControl';
-import Button from '../common/Button';
 
 export default function ColorButtons() {
   const { sendCommand, isExecuting } = useTVControl();
