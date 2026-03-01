@@ -1,5 +1,4 @@
 import bravia from '../../../lib';
-import type { BraviaClient } from '../types/bravia';
 import fs from 'fs';
 import path from 'path';
 
@@ -7,7 +6,7 @@ import path from 'path';
  * Service class that wraps the callback-based bravia library with a Promise-based interface
  */
 export class BraviaService {
-  private client: BraviaClient | null = null;
+  private client: any = null;
   private tvIp: string;
   private pskKey: string;
   private commandListCache: Record<string, string> | null = null;
@@ -37,7 +36,7 @@ export class BraviaService {
     console.log(`[BraviaService] Initializing connection to TV at ${this.tvIp}...`);
     return new Promise((resolve, reject) => {
       try {
-        bravia(this.tvIp, this.pskKey, (client) => {
+        bravia(this.tvIp, this.pskKey, (client: any) => {
           this.client = client;
           console.log(`[BraviaService] ✓ Successfully connected to TV at ${this.tvIp}`);
           resolve();
@@ -119,7 +118,7 @@ export class BraviaService {
     console.log(`[BraviaService] Fetching command list from TV...`);
     return new Promise((resolve, reject) => {
       try {
-        this.client!.getCommandList((commands) => {
+        this.client!.getCommandList((commands: any) => {
           this.commandListCache = commands;
           console.log(`[BraviaService] ✓ Received ${Object.keys(commands).length} commands from TV`);
           resolve(commands);
