@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { tvApi } from '../services/api-client';
+import type { PlayingContent, TVInfoResponse } from '../types/api';
 
 interface TVStatus {
   volume: {
@@ -11,7 +12,7 @@ interface TVStatus {
   power: {
     status: string;
   } | null;
-  playing: any | null;
+  playing: PlayingContent | null;
 }
 
 interface TVState {
@@ -27,6 +28,9 @@ interface TVState {
   // TV Status
   tvStatus: TVStatus | null;
 
+  // TV Info (external inputs, apps, system)
+  tvInfo: TVInfoResponse | null;
+
   // Errors
   error: string | null;
 
@@ -37,6 +41,7 @@ interface TVState {
   fetchStatus: () => Promise<void>;
   fetchCommands: () => Promise<void>;
   fetchTVStatus: () => Promise<void>;
+  fetchTVInfo: () => Promise<void>;
   executeCommand: (command: string) => Promise<void>;
   updateConfig: (tvIp: string, pskKey: string, macAddress?: string) => Promise<void>;
   clearError: () => void;
@@ -50,6 +55,7 @@ export const useTVStore = create<TVState>((set, get) => ({
   isExecuting: false,
   lastCommand: null,
   tvStatus: null,
+  tvInfo: null,
   error: null,
   isLoading: false,
 
@@ -169,6 +175,18 @@ export const useTVStore = create<TVState>((set, get) => ({
     } catch (error: any) {
       console.error('Failed to fetch TV status:', error);
       // Don't set error for status fetch failures (non-critical)
+    }
+  },
+
+  // Fetch comprehensive TV info (external inputs, apps, system)
+  fetchTVInfo: async () => {
+    try {
+      const response = await tvApi.getTVInfo();
+      if (response.data.success && response.data.data) {
+        set({ tvInfo: response.data.data });
+      }
+    } catch (error: any) {
+      console.error('Failed to fetch TV info:', error);
     }
   },
 

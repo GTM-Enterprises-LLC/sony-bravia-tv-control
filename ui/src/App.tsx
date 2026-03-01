@@ -5,13 +5,14 @@ import Footer from './components/Layout/Footer';
 import RemoteControl from './components/RemoteControl/RemoteControl';
 
 function App() {
-  const { fetchStatus, fetchCommands, fetchTVStatus } = useTVStore();
+  const { fetchStatus, fetchCommands, fetchTVStatus, fetchTVInfo } = useTVStore();
 
   useEffect(() => {
     // Fetch initial status and commands
     fetchStatus();
     fetchCommands();
     fetchTVStatus();
+    fetchTVInfo();
 
     // Poll connection status every 10 seconds
     const statusInterval = setInterval(() => {
@@ -23,11 +24,17 @@ function App() {
       fetchTVStatus();
     }, 5000);
 
+    // Poll TV info (external inputs, apps) every 30 seconds
+    const tvInfoInterval = setInterval(() => {
+      fetchTVInfo();
+    }, 30000);
+
     return () => {
       clearInterval(statusInterval);
       clearInterval(tvStatusInterval);
+      clearInterval(tvInfoInterval);
     };
-  }, [fetchStatus, fetchCommands, fetchTVStatus]);
+  }, [fetchStatus, fetchCommands, fetchTVStatus, fetchTVInfo]);
 
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col">

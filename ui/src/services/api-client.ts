@@ -4,7 +4,8 @@ import type {
   StatusResponse,
   CommandsResponse,
   ConfigResponse,
-  UpdateConfigRequest
+  UpdateConfigRequest,
+  TVInfoResponse
 } from '../types/api';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
@@ -41,6 +42,12 @@ export const tvApi = {
    */
   getTVStatus: () =>
     apiClient.get<APIResponse>('/tv-status'),
+
+  /**
+   * Get comprehensive TV info (external inputs, apps, system info)
+   */
+  getTVInfo: () =>
+    apiClient.get<APIResponse<TVInfoResponse>>('/tv-info'),
 
   /**
    * Execute a specific command by name
