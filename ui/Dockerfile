@@ -13,6 +13,9 @@ COPY . .
 ARG VITE_API_URL=/api/v1
 ENV VITE_API_URL=$VITE_API_URL
 
+ARG VITE_BASE_PATH=/
+ENV VITE_BASE_PATH=$VITE_BASE_PATH
+
 RUN npm run build
 
 # Stage 2: Nginx serves the static files
