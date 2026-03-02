@@ -27,7 +27,15 @@ export default function Footer() {
             )}
           </div>
           <div className="text-gray-500 text-xs">
-            © 2026 Sony Bravia Remote
+            © 2026{' '}
+            <a
+              href="https://gtmenterprisesllc.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              GTM Enterprises LLC
+            </a>
           </div>
         </div>
       </div>
