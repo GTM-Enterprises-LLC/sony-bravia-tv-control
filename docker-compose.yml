@@ -24,7 +24,10 @@ services:
     build:
       context: ./ui
       dockerfile: Dockerfile
-    # host networking puts Nginx directly on port 80 of the Pi.
+      args:
+        - VITE_BASE_PATH=/bravia/
+        - VITE_API_URL=/bravia/api/v1
+    # host networking puts Nginx directly on port 3101 of the Pi.
     # Nginx then proxies /api to localhost:3001 (the server above).
     network_mode: host
     depends_on:
