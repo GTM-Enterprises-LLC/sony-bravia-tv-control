@@ -43,6 +43,7 @@ interface TVState {
   fetchTVStatus: () => Promise<void>;
   fetchTVInfo: () => Promise<void>;
   executeCommand: (command: string) => Promise<void>;
+  sendText: (text: string) => Promise<void>;
   updateConfig: (tvIp: string, pskKey: string, macAddress?: string) => Promise<void>;
   clearError: () => void;
 }
@@ -116,6 +117,19 @@ export const useTVStore = create<TVState>((set, get) => ({
         error: errorMessage
       });
       console.error(`Failed to execute command ${command}:`, error);
+      throw error;
+    }
+  },
+
+  // Send text to the focused field on the TV
+  sendText: async (text: string) => {
+    try {
+      await tvApi.sendText(text);
+      set({ error: null });
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error?.message || 'Failed to send text';
+      set({ error: errorMessage });
+      console.error('Failed to send text:', error);
       throw error;
     }
   },

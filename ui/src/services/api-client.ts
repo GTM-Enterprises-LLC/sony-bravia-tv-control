@@ -93,5 +93,11 @@ export const tvApi = {
     apiClient.post<APIResponse>(`/input/hdmi/${number}`),
 
   launchApp: (appName: string) =>
-    apiClient.post<APIResponse>(`/apps/${appName}`)
+    apiClient.post<APIResponse>(`/apps/${appName}`),
+
+  sendText: (text: string) =>
+    apiClient.post<APIResponse>('/text', { text }),
+
+  getText: () =>
+    apiClient.get<APIResponse>('/text')
 };

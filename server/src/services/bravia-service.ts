@@ -258,6 +258,22 @@ export class BraviaService {
   }
 
   /**
+   * Send text to the currently focused text field on the TV.
+   * Replaces the entire value of the focused field — the TV has no
+   * per-keystroke API, so callers should send the full buffer each time.
+   */
+  async sendText(text: string): Promise<any> {
+    return this.makeJsonRpcRequest('/sony/appControl', 'setTextForm', '1.0', [text]);
+  }
+
+  /**
+   * Read the text currently shown in the focused text field on the TV.
+   */
+  async getText(): Promise<any> {
+    return this.makeJsonRpcRequest('/sony/appControl', 'getTextForm', '1.0', []);
+  }
+
+  /**
    * Make a JSON-RPC request to the TV
    */
   private async makeJsonRpcRequest(path: string, method: string, version: string, params: any[]): Promise<any> {

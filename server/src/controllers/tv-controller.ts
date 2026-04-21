@@ -308,6 +308,50 @@ export class TVController {
   };
 
   /**
+   * Send text to the focused text field on the TV
+   */
+  sendText = async (req: Request, res: Response): Promise<void> => {
+    const { text } = req.body ?? {};
+
+    if (typeof text !== 'string') {
+      res.status(400).json({
+        success: false,
+        error: {
+          message: 'text (string) is required in request body',
+          code: 'INVALID_REQUEST'
+        },
+        timestamp: new Date().toISOString()
+      });
+      return;
+    }
+
+    await this.braviaService.sendText(text);
+
+    const response: SuccessResponse = {
+      success: true,
+      data: { length: text.length },
+      timestamp: new Date().toISOString()
+    };
+
+    res.json(response);
+  };
+
+  /**
+   * Get the text currently in the focused text field on the TV
+   */
+  getText = async (req: Request, res: Response): Promise<void> => {
+    const result = await this.braviaService.getText();
+
+    const response: SuccessResponse = {
+      success: true,
+      data: result,
+      timestamp: new Date().toISOString()
+    };
+
+    res.json(response);
+  };
+
+  /**
    * Get current TV configuration (non-sensitive)
    */
   getConfig = async (req: Request, res: Response): Promise<void> => {

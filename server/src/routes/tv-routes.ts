@@ -42,5 +42,9 @@ export function createTVRoutes(controller: TVController): Router {
   // App launcher
   router.post('/apps/:appName', asyncHandler(controller.launchApp));
 
+  // Text input (types into the focused text field on the TV)
+  router.get('/text', asyncHandler(controller.getText));
+  router.post('/text', asyncHandler(controller.sendText));
+
   return router;
 }

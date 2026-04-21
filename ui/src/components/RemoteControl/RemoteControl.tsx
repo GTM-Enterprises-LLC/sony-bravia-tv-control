@@ -6,6 +6,7 @@ import ChannelControls from './ChannelControls';
 import NumberPad from './NumberPad';
 import ColorButtons from './ColorButtons';
 import AppLaunchers from './AppLaunchers';
+import TextInput from './TextInput';
 import { useTVStore } from '../../store/tv-store';
 
 export default function RemoteControl() {
@@ -49,6 +50,9 @@ export default function RemoteControl() {
         </div>
         <div className="border-t border-gray-700 pt-6">
           <AppLaunchers />
+        </div>
+        <div className="border-t border-gray-700 pt-6">
+          <TextInput />
         </div>
       </div>
     </div>
