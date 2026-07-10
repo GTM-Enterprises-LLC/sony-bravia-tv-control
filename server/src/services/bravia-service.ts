@@ -85,6 +85,24 @@ export class BraviaService {
       }
     }
 
+    // Resolve and log the underlying IRCC code so it's clear exactly what is
+    // being sent to the TV for each button/action. Also surfaces the silent
+    // failure where an unknown command name resolves to nothing.
+    try {
+      const list = await this.getCommandList();
+      const code = list[command];
+      if (code === undefined) {
+        console.warn(
+          `[BraviaService] ⚠️  Command "${command}" not found in TV command list — nothing will be sent. ` +
+          `Available: ${Object.keys(list).join(', ')}`
+        );
+      } else {
+        console.log(`[BraviaService] → action "${command}" resolves to IRCC code: ${code}`);
+      }
+    } catch (err) {
+      console.warn(`[BraviaService] Could not resolve IRCC code for "${command}":`, err);
+    }
+
     // Regular command execution
     console.log(`[BraviaService] Executing command: ${command}`);
     return new Promise((resolve, reject) => {

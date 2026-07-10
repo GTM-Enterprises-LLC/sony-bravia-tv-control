@@ -22,6 +22,69 @@ export const apiClient: AxiosInstance = axios.create({
 });
 
 /**
+ * Debug logging for outgoing TV actions.
+ *
+ * Every button click ultimately becomes one HTTP request through this client,
+ * so logging here shows exactly which action is sent to the TV and what came
+ * back. Opt-in (also works on the deployed build) — enable in the browser
+ * console with:  localStorage.tvDebug = '1'   then reload. Disable: remove it.
+ */
+const tvDebugEnabled = (): boolean => {
+  try {
+    return localStorage.getItem('tvDebug') === '1' || import.meta.env.DEV;
+  } catch {
+    return false;
+  }
+};
+
+apiClient.interceptors.request.use((config) => {
+  if (tvDebugEnabled()) {
+    const method = (config.method ?? 'get').toUpperCase();
+    const url = `${config.baseURL ?? ''}${config.url ?? ''}`;
+    console.log(
+      `%c[TV →]%c ${method} ${url}`,
+      'color:#a855f7;font-weight:bold',
+      'color:inherit',
+      config.data ?? ''
+    );
+  }
+  return config;
+});
+
+apiClient.interceptors.response.use(
+  (response) => {
+    if (tvDebugEnabled()) {
+      const url = `${response.config.baseURL ?? ''}${response.config.url ?? ''}`;
+      console.log(
+        `%c[TV ✓]%c ${response.status} ${url}`,
+        'color:#22c55e;font-weight:bold',
+        'color:inherit',
+        response.data
+      );
+    }
+    return response;
+  },
+  (error) => {
+    if (tvDebugEnabled()) {
+      const cfg = error.config ?? {};
+      const url = `${cfg.baseURL ?? ''}${cfg.url ?? ''}`;
+      console.error(
+        `%c[TV ✗]%c ${error.response?.status ?? 'ERR'} ${cfg.method?.toUpperCase() ?? ''} ${url}`,
+        'color:#ef4444;font-weight:bold',
+        'color:inherit',
+        error.response?.data ?? error.message
+      );
+    }
+    return Promise.reject(error);
+  }
+);
+
+if (typeof window !== 'undefined' && !import.meta.env.DEV) {
+  // One-time hint so the toggle is discoverable in production.
+  console.info("[TV] Debug logging available: run  localStorage.tvDebug = '1'  and reload to trace actions.");
+}
+
+/**
  * TV API service with typed methods
  */
 export const tvApi = {
