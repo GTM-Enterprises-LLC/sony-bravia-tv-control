@@ -330,8 +330,11 @@ export class BraviaService {
       const response = await axios.post(url, payload, { headers, timeout: 5000 });
 
       if (response.data.error) {
-        console.log(`[BraviaService] API Error: ${response.data.error.message}`);
-        throw new Error(response.data.error.message);
+        // Sony returns errors as [code, "message"], not {message}.
+        const err = response.data.error;
+        const message = Array.isArray(err) ? `${err[0]}: ${err[1]}` : (err?.message ?? JSON.stringify(err));
+        console.log(`[BraviaService] API Error (${method}): ${message}`);
+        throw new Error(message);
       }
 
       return response.data.result;

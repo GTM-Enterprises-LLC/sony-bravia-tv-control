@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { IconType } from 'react-icons';
-import { SiNetflix, SiYoutube, SiHbo, SiTubi, SiSpotify } from 'react-icons/si';
+import { SiNetflix, SiYoutube, SiPrimevideo, SiHbo, SiTubi, SiSpotify } from 'react-icons/si';
 import { FiMonitor, FiPlayCircle, FiChevronDown, FiChevronRight } from 'react-icons/fi';
 import { useTVControl } from '../../hooks/useTVControl';
 import { useTVStore } from '../../store/tv-store';
@@ -13,7 +13,7 @@ const FAVORITES: { title: string; icon?: IconType }[] = [
   { title: 'Netflix', icon: SiNetflix },
   { title: 'YouTube', icon: SiYoutube },
   { title: 'Disney+' },
-  { title: 'Prime Video' },
+  { title: 'Prime Video', icon: SiPrimevideo },
   { title: 'HBO Max', icon: SiHbo },
   { title: 'Tubi', icon: SiTubi },
   { title: 'Pluto TV' },
