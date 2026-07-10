@@ -158,6 +158,10 @@ export const tvApi = {
   launchApp: (appName: string) =>
     apiClient.post<APIResponse>(`/apps/${appName}`),
 
+  /** Launch any installed app by its URI (from getApplicationList / tv-info). */
+  launchAppByUri: (uri: string) =>
+    apiClient.post<APIResponse>('/apps/launch', { uri }),
+
   sendText: (text: string) =>
     apiClient.post<APIResponse>('/text', { text }),
 

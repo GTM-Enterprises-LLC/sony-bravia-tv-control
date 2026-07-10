@@ -52,10 +52,17 @@ export interface ExternalInput {
   icon?: string;
 }
 
+export interface BraviaApp {
+  title: string;
+  uri: string;
+  icon?: string;
+}
+
 export interface TVInfoResponse {
   system: any | null;
   externalInputs: ExternalInput[] | null;
-  applications: any | null;
+  // getApplicationList returns a nested array: [[{title, uri, icon}, ...]]
+  applications: BraviaApp[][] | null;
   network: any | null;
   led: any | null;
 }

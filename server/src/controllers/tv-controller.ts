@@ -308,6 +308,36 @@ export class TVController {
   };
 
   /**
+   * Launch an installed app by URI (works for any app, not just those with
+   * IRCC codes). URI comes from the getApplicationList data in /tv-info.
+   */
+  launchAppByUri = async (req: Request, res: Response): Promise<void> => {
+    const { uri } = req.body ?? {};
+
+    if (typeof uri !== 'string' || !uri) {
+      res.status(400).json({
+        success: false,
+        error: {
+          message: 'uri (string) is required in request body',
+          code: 'INVALID_REQUEST'
+        },
+        timestamp: new Date().toISOString()
+      });
+      return;
+    }
+
+    await this.braviaService.setActiveApp(uri);
+
+    const response: SuccessResponse = {
+      success: true,
+      data: { uri },
+      timestamp: new Date().toISOString()
+    };
+
+    res.json(response);
+  };
+
+  /**
    * Send text to the focused text field on the TV
    */
   sendText = async (req: Request, res: Response): Promise<void> => {

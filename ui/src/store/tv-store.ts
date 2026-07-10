@@ -43,6 +43,7 @@ interface TVState {
   fetchTVStatus: () => Promise<void>;
   fetchTVInfo: () => Promise<void>;
   executeCommand: (command: string) => Promise<void>;
+  launchAppByUri: (uri: string) => Promise<void>;
   sendText: (text: string) => Promise<void>;
   updateConfig: (tvIp: string, pskKey: string, macAddress?: string) => Promise<void>;
   clearError: () => void;
@@ -117,6 +118,21 @@ export const useTVStore = create<TVState>((set, get) => ({
         error: errorMessage
       });
       console.error(`Failed to execute command ${command}:`, error);
+      throw error;
+    }
+  },
+
+  // Launch an installed app by its URI
+  launchAppByUri: async (uri: string) => {
+    set({ isExecuting: true, error: null });
+    try {
+      await tvApi.launchAppByUri(uri);
+      set({ isExecuting: false, lastCommand: uri, error: null });
+      await get().fetchTVStatus();
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error?.message || 'Failed to launch app';
+      set({ isExecuting: false, error: errorMessage });
+      console.error('Failed to launch app:', error);
       throw error;
     }
   },

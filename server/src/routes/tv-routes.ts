@@ -39,7 +39,8 @@ export function createTVRoutes(controller: TVController): Router {
   // Input control
   router.post('/input/hdmi/:number', asyncHandler(controller.switchHDMI));
 
-  // App launcher
+  // App launcher — /apps/launch (by URI) must precede the :appName param route
+  router.post('/apps/launch', asyncHandler(controller.launchAppByUri));
   router.post('/apps/:appName', asyncHandler(controller.launchApp));
 
   // Text input (types into the focused text field on the TV)

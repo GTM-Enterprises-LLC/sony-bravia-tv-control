@@ -119,6 +119,16 @@ export class BraviaService {
   }
 
   /**
+   * Launch an installed app by its URI (from getApplicationList).
+   * Unlike IRCC commands, this works for any installed app, not just the
+   * handful that have dedicated remote-control codes.
+   */
+  async setActiveApp(uri: string): Promise<any> {
+    console.log(`[BraviaService] → launching app via setActiveApp: ${uri}`);
+    return this.makeJsonRpcRequest('/sony/appControl', 'setActiveApp', '1.0', [{ uri }]);
+  }
+
+  /**
    * Get all available commands from the TV
    * Results are cached to avoid repeated API calls
    */
